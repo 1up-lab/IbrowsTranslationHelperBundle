@@ -50,7 +50,7 @@ class TranslationWebTest extends WebTestCase
 
         $creator = $translator->getCreator();
         /* @var $creator DefaultCreator */
-        $creator->setPath(__DIR__ . '/../Resources/translations');
+        $creator->setPath($this->getTranslationPath());
 
         $translator->setDecorate('!!!%s');
 
@@ -113,9 +113,13 @@ class TranslationWebTest extends WebTestCase
         $this->resetFiles();
     }
 
+    protected function getTranslationPath(){
+        return __DIR__ . DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'translations';
+    }
+
     protected function resetFiles()
     {
-        $transpath = __DIR__ . DIRECTORY_SEPARATOR. '..'.DIRECTORY_SEPARATOR.'Resources'.DIRECTORY_SEPARATOR.'translations';
+        $transpath = $this->getTranslationPath();
         @mkdir($transpath);
         $handle = opendir($transpath);
         while (false !== ($entry = readdir($handle))) {
