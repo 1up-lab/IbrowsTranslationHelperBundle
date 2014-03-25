@@ -11,10 +11,10 @@ Normalize translationkeys
 
 Decorate Missing Keys
 
+Use your own customized Creator
 
-Currently only YML Translation-Creator in the Bundle.
+Currently only YML Translation-Creator shipped in the Bundle
 
-But use your own customized Creator
 
 Install & setup the bundle
 --------------------------
