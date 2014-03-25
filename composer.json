@@ -1,0 +1,22 @@
+{
+    "name": "ibrows/translation-helper--bundle",
+    "type": "symfony-bundle",
+    "description": "Symfony Translation Helper Bundle",
+    "keywords": ["Translation","Helper","Generator","Creator","Wrapper"],
+    "homepage": "http://www.ibrows.ch",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marc Steiner",
+            "homepage": "https://github.com/ibrows"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "symfony/symfony": ">=2.1",
+        "symfony/framework-bundle": ">=2.1",
+    },
+    "autoload": {
+        "psr-4": { "Ibrows\\TranslationHelperBundle": "" }
+    },
+}

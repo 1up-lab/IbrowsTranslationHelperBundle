@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="ibrows_translation_helper.wrapper" class="Ibrows\TranslationHelperBundle\Translation\TranslatorWrapper">
+            <argument type="service" id="ibrows_translation_helper.defaultcreator"></argument>
+        </service>
+        <service id="ibrows_translation_helper.defaultcreator" class="Ibrows\TranslationHelperBundle\Translation\DefaultCreator">
+            <argument type="service" id="translation.writer"></argument>
+            <argument type="string" >yml</argument>
+            <argument type="string" >%kernel.root_dir%/Resources/translations</argument>
+        </service>
+
+	</services>
+</container>
