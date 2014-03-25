@@ -1,5 +1,5 @@
 {
-    "name": "ibrows/translation-helper--bundle",
+    "name": "ibrows/translation-helper-bundle",
     "type": "symfony-bundle",
     "description": "Symfony Translation Helper Bundle",
     "keywords": ["Translation","Helper","Generator","Creator","Wrapper"],
