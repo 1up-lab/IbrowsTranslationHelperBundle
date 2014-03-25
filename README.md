@@ -4,12 +4,16 @@ IbrowsTranslationHelperBundle
 [![Build Status](https://travis-ci.org/ibrows/IbrowsTranslationHelperBundle.svg?branch=master)](https://travis-ci.org/ibrows/IbrowsTranslationHelperBundle)
 
 Provide a TranslationWrapper which can create missing translations for you
+
 Enable/disbale creation over config.
+
 Normalize translationkeys
+
 Decorate Missing Keys
 
 
-Currently only YML Translation-Creator in the Bundle
+Currently only YML Translation-Creator in the Bundle.
+
 But use your own customized Creator
 
 Install & setup the bundle
