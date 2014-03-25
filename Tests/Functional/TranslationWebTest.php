@@ -6,7 +6,7 @@ use Ibrows\TranslationHelperBundle\Translation\DefaultCreator;
 use Ibrows\TranslationHelperBundle\Translation\TranslatorWrapper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class TranslationTest extends WebTestCase
+class TranslationWebTest extends WebTestCase
 {
 
     protected $container = null;
