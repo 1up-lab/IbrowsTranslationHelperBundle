@@ -35,7 +35,7 @@ Install & setup the bundle
     $ php composer.phar update ibrows/translation-helper-bundle
     ```
 
-    Composer will install the bundle to your project's `ibrows/simplecms-bundle` directory. ( PSR-4 )
+    Composer will install the bundle to your project's `ibrows/translation-helper-bundle` directory. ( PSR-4 )
 
 3. Add the bundle to your `AppKernel` class
 
