@@ -224,5 +224,11 @@ class TranslatorWrapper implements TranslatorInterface
         return $this->translator;
     }
 
-
+    public function __call($method, $args) {
+        if(is_callable(array($this->translator,$method))) {
+            return call_user_func_array(array($this->translator,$method), $args);
+        } else {
+            trigger_error("Call to undefined method '{$method}'");
+        }
+    }
 }
