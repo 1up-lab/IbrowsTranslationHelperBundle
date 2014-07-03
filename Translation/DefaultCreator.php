@@ -48,14 +48,20 @@ class DefaultCreator implements CreatorInterface
         $this->writer = $writer;
         $this->format = $format;
         $this->path = $path;
-        $supportedFormats = $writer->getFormats();
-        if (!in_array($format, $supportedFormats)) {
+        if (!$this->supportFormat($format)) {
             throw new \Exception('Wrong format' . $format . '. Supported formats are ' . implode(', ', $supportedFormats));
         }
     }
 
 
-
+    /**
+     * @param $format
+     * @return bool
+     */
+    protected  function supportFormat($format){
+        $supportedFormats = $this->writer->getFormats();
+        return in_array($format, $supportedFormats);
+    }
 
     /**
      * @param string $id
@@ -66,8 +72,7 @@ class DefaultCreator implements CreatorInterface
      */
     public function createTranslation($id, $domain, $locale, MessageCatalogue $catalogue)
     {
-        $value = sprintf($this->decorate, $id);
-        $catalogue->set($id, $value, $domain);
+        $this->setNewId($id,$domain,$catalogue);
         $messages = ($catalogue->all($domain));
         $cataloguetemp = new MessageCatalogue($locale, array($domain => $messages));
         $this->writer->writeTranslations($cataloguetemp, $this->format, array('path' => $this->path));
@@ -77,6 +82,25 @@ class DefaultCreator implements CreatorInterface
                 unlink($backupfullpath);
             }
         }
+    }
+
+    /**
+     * Set the new id into the MessageCatalogue
+     * @param $id
+     * @param $domain
+     * @param MessageCatalogue $catalogue
+     */
+    protected function setNewId($id,$domain, MessageCatalogue $catalogue){
+        $value = $this->decorate($id);
+        $catalogue->set($id, $value, $domain);
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    protected function decorate($id){
+        return sprintf($this->decorate, $id);
     }
 
     /**

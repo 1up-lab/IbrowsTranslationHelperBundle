@@ -22,22 +22,27 @@ class CompilerPass implements CompilerPassInterface
         $wrapper = $containerBuilder->getDefinition('ibrows_translation_helper.wrapper');
         $wrapper->addArgument(new Reference($id));
         $configs = $containerBuilder->getParameter('ibrows_translation_helper.translator');
-        foreach($configs as $key => $value){
-            if($key == 'creator'){
+        $creatorKey = null;
+        foreach ($configs as $key => $value) {
+            if ($key == 'creator') {
+                $creatorKey = $value;
                 $value = new Reference($value);
             }
-            $wrapper->addMethodCall('set'.$key,array($value));
+            $wrapper->addMethodCall('set' . $key, array($value));
         }
 
 
+        $containerBuilder->setAlias('translator', 'ibrows_translation_helper.wrapper');
 
-        $containerBuilder->setAlias('translator','ibrows_translation_helper.wrapper');
 
-
-        $creator = $containerBuilder->getDefinition('ibrows_translation_helper.defaultcreator');
+        $creator = $containerBuilder->getDefinition($creatorKey);
         $configs = $containerBuilder->getParameter('ibrows_translation_helper.defaultCreator');
-        foreach($configs as $key => $value){
-            $creator->addMethodCall('set'.$key,array($value));
+        $rfClass = new \ReflectionClass($creator->getClass());
+        foreach ($configs as $key => $value) {
+            if ($rfClass->hasMethod('set' . $key)) {
+                $creator->addMethodCall('set' . $key, array($value));
+            }
+
         }
 
     }
