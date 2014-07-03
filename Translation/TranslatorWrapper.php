@@ -33,6 +33,10 @@ class TranslatorWrapper implements TranslatorInterface
      */
     protected $create = true;
     /**
+     * @var bool
+     */
+    protected $deleteCache = true;
+    /**
      * @var string
      */
     protected $decorate = "!%s!";
@@ -90,6 +94,9 @@ class TranslatorWrapper implements TranslatorInterface
 
         if ($this->create) {
             $this->creator->createTranslation($id, $domain, $locale, $catalogue);
+            if ($this->deleteCache) {
+                $this->removeLocalesCacheFiles(array($locale));
+            }
         }
 
 
@@ -128,30 +135,6 @@ class TranslatorWrapper implements TranslatorInterface
     }
 
     /**
-     * @param $locale
-     * @return MessageCatalogue
-     */
-    protected function getCatalogue($locale)
-    {
-        $rf = new \ReflectionObject($this->translator);
-        $rfp = $rf->getProperty('catalogues');
-        $rfp->setAccessible(true);
-        $catalogues = $rfp->getValue($this->translator);
-        $rfp->setAccessible(false);
-
-        return $catalogues[$locale];
-    }
-
-    /**
-     * @param string $string
-     * @return string
-     */
-    protected function normalize($string)
-    {
-        return  mb_strtolower( preg_replace('/(?<=[a-z])([A-Z])/', '_$1',$string), 'UTF-8');
-    }
-
-    /**
      * @param $id
      * @param $domain
      * @param $locale
@@ -175,6 +158,14 @@ class TranslatorWrapper implements TranslatorInterface
     }
 
     /**
+     * @return \Ibrows\TranslationHelperBundle\Translation\CreatorInterface
+     */
+    public function getCreator()
+    {
+        return $this->creator;
+    }
+
+    /**
      * @param \Ibrows\TranslationHelperBundle\Translation\CreatorInterface $creator
      */
     public function setCreator($creator)
@@ -183,21 +174,27 @@ class TranslatorWrapper implements TranslatorInterface
     }
 
     /**
-     * @return \Ibrows\TranslationHelperBundle\Translation\CreatorInterface
-     */
-    public function getCreator()
-    {
-        return $this->creator;
-    }
-
-
-
-    /**
      * @param string $decorate
      */
     public function setDecorate($decorate)
     {
         $this->decorate = $decorate;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getDeleteCache()
+    {
+        return $this->deleteCache;
+    }
+
+    /**
+     * @param boolean $deleteCache
+     */
+    public function setDeleteCache($deleteCache)
+    {
+        $this->deleteCache = $deleteCache;
     }
 
     /**
@@ -224,11 +221,104 @@ class TranslatorWrapper implements TranslatorInterface
         return $this->translator;
     }
 
-    public function __call($method, $args) {
-        if(is_callable(array($this->translator,$method))) {
-            return call_user_func_array(array($this->translator,$method), $args);
+    public function __call($method, $args)
+    {
+        if (is_callable(array($this->translator, $method))) {
+            return call_user_func_array(array($this->translator, $method), $args);
         } else {
             trigger_error("Call to undefined method '{$method}'");
         }
     }
+
+    /**
+     * Remove the cache file corresponding to the given locale.
+     *
+     * @param string $locale
+     * @return boolean
+     */
+    protected function removeCacheFile($locale)
+    {
+        if(!$this->getCacheDir()){
+            return false;
+        }
+        $localeExploded = explode('_', $locale);
+        $localePattern = sprintf('%s/catalogue.*%s*.php', $this->getCacheDir(), $localeExploded[0]);
+        $files = glob($localePattern);
+
+        $deleted = true;
+        foreach ($files as $file) {
+            if (!unlink($file)) {
+                $deleted = false;
+            }
+            $metadata = $file . '.meta';
+            if (file_exists($metadata)) {
+                unlink($metadata);
+            }
+        }
+
+        return $deleted;
+    }
+
+    /**
+     * Remove the cache file corresponding to each given locale.
+     *
+     * @param array $locales
+     */
+    protected  function removeLocalesCacheFiles(array $locales)
+    {
+        if(!$this->getCacheDir()){
+            return false;
+        }
+        foreach ($locales as $locale) {
+            $this->removeCacheFile($locale);
+        }
+
+        // also remove database.resources.php cache file
+        $file = sprintf('%s/database.resources.php', $this->getCacheDir());
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
+        $metadata = $file . '.meta';
+        if (file_exists($metadata)) {
+            unlink($metadata);
+        }
+    }
+
+    /**
+     * @param $locale
+     * @return MessageCatalogue
+     */
+    protected function getCatalogue($locale)
+    {
+        $rf = new \ReflectionObject($this->translator);
+        $rfp = $rf->getProperty('catalogues');
+        $rfp->setAccessible(true);
+        $catalogues = $rfp->getValue($this->translator);
+        $rfp->setAccessible(false);
+
+        return $catalogues[$locale];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getCacheDir(){
+        $rf = new \ReflectionObject($this->translator);
+        $rfp = $rf->getProperty('options');
+        $rfp->setAccessible(true);
+        $options = $rfp->getValue($this->translator);
+        $rfp->setAccessible(false);
+        return $options['cache_dir'];
+    }
+
+    /**
+     * @param string $string
+     * @return string
+     */
+    protected function normalize($string)
+    {
+        return mb_strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $string), 'UTF-8');
+    }
+
 }

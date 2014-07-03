@@ -27,6 +27,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('creator')->defaultValue('ibrows_translation_helper.defaultcreator')->end()
                 ->scalarNode('decorate')->defaultValue('!!!%s')->end()
                 ->arrayNode('ignoreDomains')->prototype('variable')->end()->end()
+                ->booleanNode('deleteCache')->defaultFalse()->end()
             ->end()->end()
             ->arrayNode('defaultCreator')->addDefaultsIfNotSet()->children()
                 ->scalarNode('format')->defaultValue('yml')->end()
