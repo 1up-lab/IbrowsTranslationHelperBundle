@@ -4,7 +4,6 @@ namespace Ibrows\TranslationHelperBundle\Translation;
 
 
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Component\Translation\Writer\TranslationWriter;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -30,9 +29,9 @@ class YmlCreator extends DefaultCreator
     public function createTranslation($id, $domain, $locale, MessageCatalogue $catalogue)
     {
 
-        $this->setNewId($id,$domain,$catalogue);
-        $file = $domain.'.'.$catalogue->getLocale().'.'.$this->format;
-        $fullpath = $this->path.'/'.$file;
+        $this->setNewId($id, $domain, $catalogue);
+        $file = $domain . '.' . $catalogue->getLocale() . '.' . $this->format;
+        $fullpath = $this->path . '/' . $file;
         $allMessages = $catalogue->all($domain);
 
         $this->flatten($allMessages);
@@ -42,6 +41,12 @@ class YmlCreator extends DefaultCreator
         //second sort to make sure first-level sort
         uksort($allMessages, 'strnatcasecmp');
         $yaml = Yaml::dump($allMessages, 9);
+        if ($this->backup && file_exists($fullpath)) {
+            $backupfullpath = $this->path . '/' . $domain . '.' . $locale . '.' . $this->format . '~';
+            if (!file_exists($backupfullpath)) {
+                copy($fullpath, $backupfullpath);
+            }
+        }
         file_put_contents($fullpath, $yaml);
 
 
@@ -64,13 +69,14 @@ class YmlCreator extends DefaultCreator
                 unset($messages[$key]);
             }
         }
+
         return $messages;
     }
 
     private function flatten(array &$messages, array $subnode = null, $path = null)
     {
         if (null === $subnode) {
-            $subnode = &$messages;
+            $subnode = & $messages;
         }
         foreach ($subnode as $key => $value) {
             if (is_array($value)) {
@@ -84,7 +90,6 @@ class YmlCreator extends DefaultCreator
             }
         }
     }
-
 
 
 }
