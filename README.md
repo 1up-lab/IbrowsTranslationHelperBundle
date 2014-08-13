@@ -71,6 +71,6 @@ And use this for SonataAdmin
         entity_manager: ~
         templates:
             form:
-                - 'IbrowsTranslationHelperBundle:Admin:form_admin_fields.html.twig'
+                - 'IbrowsTranslationHelperBundle::form_admin_fields.html.twig'
 ```
 
