@@ -52,3 +52,25 @@ Install & setup the bundle
     }
     ```
 
+
+Avoid unnecessary translations in choices
+-----------------------------------------
+
+Use this in your form_div_default_layout.html.twig
+
+    ```
+    {% extends 'form_div_layout.html.twig' %}
+    {% use '@IbrowsTranslationHelper/form_div_layout_trans_fix.html.twig' %}
+    ```
+
+
+And use this for SonataAdmin
+
+    ``` yml
+    sonata_doctrine_orm_admin:
+        entity_manager: ~
+        templates:
+            form:
+                - 'IbrowsTranslationHelperBundle:Admin:form_admin_fields.html.twig'
+    ```
+

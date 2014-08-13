@@ -1,0 +1,68 @@
+{% extends 'SonataDoctrineORMAdminBundle:Form:form_admin_fields.html.twig' %}
+
+{% block choice_widget_options %}
+    {% spaceless %}
+        {% for group_label, choice in options %}
+            {% if choice is iterable %}
+                <optgroup label="{{ group_label|trans({}, translation_domain) }}">
+                    {% set options = choice %}
+                    {{ block('choice_widget_options') }}
+                </optgroup>
+            {% else %}
+                <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
+                    {% if attr.translateChoiceValue is defined and attr.translateChoiceValue == false %}
+                        {{ choice.label }}
+                    {% else %}
+                        {{ choice.label|trans({}, translation_domain) }}
+                    {% endif %}
+                </option>
+            {% endif %}
+        {% endfor %}
+    {% endspaceless %}
+{% endblock choice_widget_options %}
+
+{% block form_label %}
+    {% spaceless %}
+
+        {% set label_class = "" %}
+        {% if sonata_admin.admin and sonata_admin.admin.getConfigurationPool().getOption('form_type') == 'horizontal' %}
+            {% set label_class = "control-label col-sm-3" %}
+        {% else %}
+            {% set label_class = "control-label" %}
+        {% endif%}
+
+        {#{{ sonata_admin.admin.getConfigurationPool().getOption('form_type') }}#}
+        {% if label is not sameas(false) %}
+            {% set label_attr = label_attr|merge({'class': label_attr.class|default('') ~ label_class }) %}
+
+            {% if not compound %}
+                {% set label_attr = label_attr|merge({'for': id}) %}
+            {% endif %}
+            {% if required %}
+                {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+            {% endif %}
+
+            {% if label is empty %}
+                {% set label = name|humanize %}
+            {% endif %}
+
+            {% if in_list_checkbox is defined and in_list_checkbox and widget is defined %}
+                <label{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>
+                {{ widget|raw }}
+                <span>
+                 {#dont translate here#}
+                 {{ label}}
+                </span>
+                </label>
+            {% else %}
+                <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+                {% if not sonata_admin.admin%}
+                    {{- label|trans({}, translation_domain) -}}
+                {% else %}
+                    {{ sonata_admin.admin.trans(label, {}, sonata_admin.field_description.translationDomain) }}
+                {% endif %}
+                </label>
+            {% endif %}
+        {% endif %}
+    {% endspaceless %}
+{% endblock form_label %}
