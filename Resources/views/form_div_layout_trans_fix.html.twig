@@ -29,7 +29,8 @@
                 </optgroup>
             {% else %}
                 <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
-                    {% if attr.translateChoiceValue is defined and attr.translateChoiceValue == false %}
+                    {% if (attr.translateChoiceValue is defined and attr.translateChoiceValue == false) or
+                          (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == false)  %}
                         {{ choice.label }}
                     {% else %}
                         {{ choice.label|trans({}, translation_domain) }}
@@ -46,7 +47,13 @@
         <div {{ block('widget_container_attributes') }}>
             {% for child in form %}
                 {{ form_widget(child) }}
-                {{ form_label(child, child.vars.label|default(null), { 'label_attr': {'translateChoiceValue': attr.translateChoiceValue} }) }}
+                {% if (attr.translateChoiceValue is defined and attr.translateChoiceValue == false) or
+                      (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == false)  %}
+                    {% set transChoiceValue = false %}
+                {% else %}
+                    {% set transChoiceValue = true %}
+                {% endif %}
+                {{ form_label(child, child.vars.label|default(null), { 'label_attr': {'translateChoiceValue': transChoiceValue} }) }}
             {% endfor %}
         </div>
     {% endspaceless %}
