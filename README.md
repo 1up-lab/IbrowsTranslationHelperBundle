@@ -54,7 +54,7 @@ Install & setup the bundle
     
 4. Sample Configuration
 
-    ```yaml
+    ``` yml
     ibrows_translation_helper:
         translator:
             normalize:            true
