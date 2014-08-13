@@ -58,7 +58,7 @@ Avoid unnecessary translations in choices
 
 Use this in your form_div_default_layout.html.twig
 
-    ```
+    ``` twig
     {% extends 'form_div_layout.html.twig' %}
     {% use '@IbrowsTranslationHelper/form_div_layout_trans_fix.html.twig' %}
     ```
