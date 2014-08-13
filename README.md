@@ -54,17 +54,21 @@ Install & setup the bundle
     
 4. Sample Configuration
 
-    ``` yaml
+    ```yaml
     ibrows_translation_helper:
-      translator:
-        normalize: true
-        create: true
-        ignoreDomains: [IbrowsSonataTranslationBundle]
-        creator: ibrows_translation_helper.ymlcreator
-      defaultCreator:
-        path: %kernel.root_dir%/../src/Ibrows/SampleBundle/Resources/translations
+        translator:
+            normalize:            true
+            create:               true
+            creator:              ibrows_translation_helper.defaultcreator
+            decorate:             !!!%s
+            ignoreDomains:        []
+            deleteCache:          false
+        defaultCreator:
+            format:               yml
+            path:                 %kernel.root_dir%/../src/Ibrows/SampleBundle/Resources/translations
+            decorate:             ___%s
+            backup:               false
     ```
-
 
 Avoid unnecessary translations in choices
 -----------------------------------------
