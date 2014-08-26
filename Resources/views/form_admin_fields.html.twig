@@ -1,4 +1,5 @@
 {% extends 'SonataDoctrineORMAdminBundle:Form:form_admin_fields.html.twig' %}
+{% use 'IbrowsTranslationHelperBundle::form_div_layout_trans_fix.html.twig' %}
 
 {% block choice_widget_options %}
     {% spaceless %}
@@ -10,10 +11,10 @@
                 </optgroup>
             {% else %}
                 <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
-                    {% if attr.translateChoiceValue is defined and attr.translateChoiceValue == false %}
-                        {{ choice.label }}
-                    {% else %}
+                    {% if attr.translateChoiceValue is defined and attr.translateChoiceValue == true %}
                         {{ choice.label|trans({}, translation_domain) }}
+                    {% else %}
+                        {{ choice.label }}
                     {% endif %}
                 </option>
             {% endif %}

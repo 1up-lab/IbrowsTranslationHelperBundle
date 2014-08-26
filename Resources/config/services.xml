@@ -4,6 +4,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://symfony.com/schema/dic/services/services-1.0.xsd">
 
+    <parameters>
+        <parameter key="ibrows_translation_helper.defaultyml">%ibrows_translation_helper.defaultyml%</parameter>
+    </parameters>
+    
     <services>
 
         <service id="ibrows_translation_helper.wrapper" class="Ibrows\TranslationHelperBundle\Translation\TranslatorWrapper">
@@ -13,6 +17,7 @@
             <argument type="service" id="translation.writer"></argument>
             <argument type="string" >yml</argument>
             <argument type="string" >%kernel.root_dir%/Resources/translations</argument>
+            <argument type="string" >%ibrows_translation_helper.defaultyml%</argument>
         </service>
         <service id="ibrows_translation_helper.ymlcreator" class="Ibrows\TranslationHelperBundle\Translation\YmlCreator">
             <argument type="service" id="translation.writer"></argument>
