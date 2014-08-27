@@ -49,10 +49,10 @@
             {% for child in form %}
                 {{ form_widget(child) }}
                 {% if (attr.translateChoiceValue is defined and attr.translateChoiceValue == false) or
-                      (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == false)  %}
-                    {% set transChoiceValue = false %}
-                {% else %}
+                      (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == true)  %}
                     {% set transChoiceValue = true %}
+                {% else %}
+                    {% set transChoiceValue = false %}
                 {% endif %}
                 {{ form_label(child, child.vars.label|default(null), { 'label_attr': {'translateChoiceValue': transChoiceValue} }) }}
             {% endfor %}
@@ -73,10 +73,10 @@
                 {% set label = name|humanize %}
             {% endif %}
             <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-            {% if label_attr.translateChoiceValue is defined and label_attr.translateChoiceValue == false %}
-                {{ label }}
-            {% else %}
+            {% if label_attr.translateChoiceValue is defined and label_attr.translateChoiceValue == true %}
                 {{ label|trans({}, translation_domain) }}
+            {% else %}
+                {{ label }}
             {% endif %}
             </label>
         {% endif %}

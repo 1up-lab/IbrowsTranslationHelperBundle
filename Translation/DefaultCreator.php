@@ -48,6 +48,8 @@ class DefaultCreator implements CreatorInterface
 
     protected $defaultYMLFilename = "default";
 
+    protected $ucFirst = false;
+
 
     /**
      * @param \Symfony\Component\Translation\Writer\TranslationWriter $writer
@@ -55,12 +57,13 @@ class DefaultCreator implements CreatorInterface
      * @param string $path
      * @internal param \Symfony\Component\Translation\TranslatorInterface $translator
      */
-    public function __construct(TranslationWriter $writer, $format, $path, $defaultYML)
+    public function __construct(TranslationWriter $writer, $format, $path, $defaultYML, $ucFirst)
     {
         $this->writer = $writer;
         $this->format = $format;
         $this->path = $path;
         $this->defaultYML = $defaultYML;
+        $this->ucFirst = $ucFirst;
         if (!$this->supportFormat($format)) {
             throw new \Exception('Wrong format' . $format . '. Supported formats are ' . implode(', ', $supportedFormats));
         }
@@ -106,17 +109,19 @@ class DefaultCreator implements CreatorInterface
     protected function setNewId($id, $domain, MessageCatalogue $catalogue) {
 
         $value = $this->checkForDefaultValue($id, $catalogue->getLocale() );
-        $id = str_replace(" ", "_", $id);
         if(!$value){
             $value = $this->decorate($id);
         }
 
-        //$t = $catalogue->get($id);
         $catalogue->set($id, $value, $domain);
     }
 
     protected function checkForDefaultValue($key ,$locale){
         $file = $this->createFilename($locale);
+        if(!$file){
+            return null;
+        }
+
         $value = Yaml::parse($file);
         if(!is_array($value)){
             return null;
@@ -166,6 +171,9 @@ class DefaultCreator implements CreatorInterface
     }
 
     protected function createFilename($locale){
+        if(!$this->defaultYML){
+            return null;
+        }
         return $this->defaultYML."/".$this->defaultYMLFilename.".".$locale.".yml";
     }
 
@@ -178,7 +186,7 @@ class DefaultCreator implements CreatorInterface
      * @param $id
      * @return string
      */
-    protected function decorate($id){
+    protected function decorate($id) {
         $id = ucfirst($id);
         return sprintf($this->decorate, $id);
     }
