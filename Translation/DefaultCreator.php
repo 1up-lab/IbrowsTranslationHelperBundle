@@ -3,7 +3,6 @@
 namespace Ibrows\TranslationHelperBundle\Translation;
 
 
-use Symfony\Component\CssSelector\Parser\Parser;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Writer\TranslationWriter;
 use Symfony\Component\Yaml\Yaml;
@@ -46,10 +45,20 @@ class DefaultCreator implements CreatorInterface
      */
     protected $defaultYML = null;
 
+    /**
+     * @var string
+     */
     protected $defaultYMLFilename = "default";
 
+    /**
+     * @var bool
+     */
     protected $ucFirst = false;
 
+    /**
+     * @var array
+     */
+    protected $fileDefaultValueData = array();
 
     /**
      * @param \Symfony\Component\Translation\Writer\TranslationWriter $writer
@@ -83,17 +92,6 @@ class DefaultCreator implements CreatorInterface
         $this->defaultYML = $defaultYML;
     }
 
-
-
-    /**
-     * @param $format
-     * @return bool
-     */
-    protected  function supportFormat($format){
-        $supportedFormats = $this->writer->getFormats();
-        return in_array($format, $supportedFormats);
-    }
-
     /**
      * @param string $id
      * @param string $domain
@@ -103,7 +101,7 @@ class DefaultCreator implements CreatorInterface
      */
     public function createTranslation($id, $domain, $locale, MessageCatalogue $catalogue)
     {
-        $this->setNewId($id,$domain,$catalogue);
+        $this->setNewId($id, $domain, $catalogue);
         $messages = ($catalogue->all($domain));
         $cataloguetemp = new MessageCatalogue($locale, array($domain => $messages));
         $this->writer->writeTranslations($cataloguetemp, $this->format, array('path' => $this->path));
@@ -113,108 +111,6 @@ class DefaultCreator implements CreatorInterface
                 unlink($backupfullpath);
             }
         }
-    }
-
-    /**
-     * Set the new id into the MessageCatalogue
-     * @param $id
-     * @param $domain
-     * @param MessageCatalogue $catalogue
-     */
-    protected function setNewId($id, $domain, MessageCatalogue $catalogue) {
-        $value = $this->checkForDefaultValue($id, $catalogue->getLocale() );
-        if(!$value && $catalogue->getFallbackCatalogue()){
-            $value = $this->checkForDefaultValue($id, $catalogue->getFallbackCatalogue()->getLocale() );
-        }
-        if(!$value){
-            $value = $this->decorate($id);
-        }
-        $catalogue->set($id, $value, $domain);
-    }
-    protected  $fileDefaultValueData = array();
-
-    protected function getFileDefaultValueData($filename,$force = false){
-        if(array_key_exists($filename,$this->fileDefaultValueData) && !$force){
-            return  $this->fileDefaultValueData[$filename];
-        }
-        $this->fileDefaultValueData[$filename] = null;
-        $value = Yaml::parse($filename);
-        if(!is_array($value)){
-            return null;
-        }
-        $normalized = $this->normalizeData($value);
-        $this->fileDefaultValueData[$filename] = $normalized;
-        return $normalized;
-    }
-
-    protected function checkForDefaultValue($key ,$locale){
-        $file = $this->createFilename($locale);
-        if(!$file){
-            return null;
-        }
-        $normalized = $this->getFileDefaultValueData($file);
-
-        if(isset($normalized[$key])){
-            return $normalized[$key];
-        }
-
-        $key = $this->seperateKeyFromPath($key);
-        $normalized = $this->normalizeDataWithKey($value);
-        if(isset($normalized[$key])){
-            return $normalized[$key];
-        }
-
-        return null;
-    }
-
-    protected function normalizeDataWithKey(array $data, &$result=array()){
-        foreach($data as $key => $value){
-            if(is_array($value)){
-                $this->normalizeDataWithKey($value, $result);
-            } else {
-                $result[$key] = $value;
-            }
-        }
-        return $result;
-    }
-
-    protected function normalizeData(array $data, &$result=array(), $path=""){
-        foreach($data as $key => $value){
-            $_path = $path;
-            if($_path != ""){
-                $_path.=".";
-            }
-            $_path.="$key";
-
-            if(is_array($value)){
-
-                $this->normalizeData($value, $result, $_path);
-            } else {
-                $result[$_path] = $value;
-            }
-        }
-        return $result;
-    }
-
-    protected function createFilename($locale){
-        if(!$this->defaultYML){
-            return null;
-        }
-        return $this->defaultYML."/".$this->defaultYMLFilename.".".$locale.".yml";
-    }
-
-    protected function seperateKeyFromPath($id){
-        $parts = explode(".", $id);
-        return $parts[count($parts)-1];
-    }
-
-    /**
-     * @param $id
-     * @return string
-     */
-    protected function decorate($id) {
-        $id = ucfirst($id);
-        return sprintf($this->decorate, $id);
     }
 
     /**
@@ -247,6 +143,165 @@ class DefaultCreator implements CreatorInterface
     public function setBackup($backup)
     {
         $this->backup = $backup;
+    }
+
+    /**
+     * @param $format
+     * @return bool
+     */
+    protected function supportFormat($format)
+    {
+        $supportedFormats = $this->writer->getFormats();
+
+        return in_array($format, $supportedFormats);
+    }
+
+    /**
+     * Set the new id into the MessageCatalogue
+     * @param $id
+     * @param $domain
+     * @param MessageCatalogue $catalogue
+     */
+    protected function setNewId($id, $domain, MessageCatalogue $catalogue)
+    {
+        $value = $this->checkForDefaultValue($id, $catalogue->getLocale());
+        if (!$value && $catalogue->getFallbackCatalogue()) {
+            $value = $this->checkForDefaultValue($id, $catalogue->getFallbackCatalogue()->getLocale());
+        }
+        if (!$value) {
+            $value = $this->decorate($id);
+        }
+        $catalogue->set($id, $value, $domain);
+    }
+
+    /**
+     * get normalized array of a translation yml file
+     * @param $filename
+     * @param bool $force
+     * @return array|null
+     */
+    protected function getFileDefaultValueData($filename, $force = false)
+    {
+        if (array_key_exists($filename, $this->fileDefaultValueData) && !$force) {
+            return $this->fileDefaultValueData[$filename];
+        }
+        $this->fileDefaultValueData[$filename] = null;
+        $value = Yaml::parse($filename);
+        if (!is_array($value)) {
+            return null;
+        }
+        $normalized = $this->normalizeData($value);
+        $this->fileDefaultValueData[$filename] = $normalized;
+
+        return $normalized;
+    }
+
+    /**
+     * get a default value or null if no one found
+     * @param $key
+     * @param $locale
+     * @return null|string
+     */
+    protected function checkForDefaultValue($key, $locale)
+    {
+        $file = $this->createFilename($locale);
+        if (!$file) {
+            return null;
+        }
+        $normalized = $this->getFileDefaultValueData($file);
+
+        if (isset($normalized[$key])) {
+            return $normalized[$key];
+        }
+
+        $key = $this->seperateKeyFromPath($key);
+        $normalized = $this->normalizeDataWithKey($value);
+        if (isset($normalized[$key])) {
+            return $normalized[$key];
+        }
+
+        return null;
+    }
+
+    /**
+     * creates a simple key => value
+     * @param array $data
+     * @param array $result
+     * @return array
+     */
+    protected function normalizeDataWithKey(array $data, &$result = array())
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $this->normalizeDataWithKey($value, $result);
+            } else {
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * creates a array prekey.key => value
+     * @param array $data
+     * @param array $result
+     * @param string $path
+     * @return array
+     */
+    protected function normalizeData(array $data, &$result = array(), $path = "")
+    {
+        foreach ($data as $key => $value) {
+            $_path = $path;
+            if ($_path != "") {
+                $_path .= ".";
+            }
+            $_path .= "$key";
+
+            if (is_array($value)) {
+
+                $this->normalizeData($value, $result, $_path);
+            } else {
+                $result[$_path] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $locale
+     * @return null|string
+     */
+    protected function createFilename($locale)
+    {
+        if (!$this->defaultYML) {
+            return null;
+        }
+
+        return $this->defaultYML . "/" . $this->defaultYMLFilename . "." . $locale . ".yml";
+    }
+
+    /**
+     * @param $id string with dots
+     * @return string
+     */
+    protected function seperateKeyFromPath($id)
+    {
+        $parts = explode(".", $id);
+
+        return $parts[count($parts) - 1];
+    }
+
+    /**
+     * @param $id
+     * @return string
+     */
+    protected function decorate($id)
+    {
+        $id = ucfirst($id);
+
+        return sprintf($this->decorate, $id);
     }
 
 
