@@ -35,7 +35,7 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('decorate')->defaultValue('___%s')->end()
                 ->booleanNode('backup')->defaultFalse()->end()
                 ->booleanNode('ucFirst')->defaultFalse()->end()
-                ->arrayNode('defaultYmlDirs')->canBeUnset()->end()
+                ->arrayNode('defaultYmlDirs')->prototype('variable')->end()
             ->end()->end()
             ->end();
 
