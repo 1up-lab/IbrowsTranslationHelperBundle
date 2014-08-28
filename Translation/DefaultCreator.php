@@ -44,7 +44,7 @@ class DefaultCreator implements CreatorInterface
     /**
      * @var string
      */
-    protected $defaultYML;
+    protected $defaultYML = null;
 
     protected $defaultYMLFilename = "default";
 
@@ -57,14 +57,13 @@ class DefaultCreator implements CreatorInterface
      * @param string $path
      * @internal param \Symfony\Component\Translation\TranslatorInterface $translator
      */
-    public function __construct(TranslationWriter $writer, $format, $path, $defaultYML)
+    public function __construct(TranslationWriter $writer, $format, $path)
     {
         $this->writer = $writer;
         $this->format = $format;
         $this->path = $path;
-        $this->defaultYML = $defaultYML;
         if (!$this->supportFormat($format)) {
-            throw new \Exception('Wrong format' . $format . '. Supported formats are ' . implode(', ', $supportedFormats));
+            throw new \Exception('Wrong format' . $format . '. Supported formats are ' . implode(', ', $this->writer->getFormats()));
         }
     }
 
@@ -75,6 +74,15 @@ class DefaultCreator implements CreatorInterface
     {
         $this->ucFirst = $ucFirst;
     }
+
+    /**
+     * @param string $defaultYML
+     */
+    public function setDefaultYML($defaultYML)
+    {
+        $this->defaultYML = $defaultYML;
+    }
+
 
 
     /**

@@ -13,7 +13,6 @@
             <argument type="service" id="translation.writer"></argument>
             <argument type="string" >yml</argument>
             <argument type="string" >%kernel.root_dir%/Resources/translations</argument>
-            <argument type="string" >%ibrows_translation_helper.creator.defaultyml%</argument>
         </service>
         <service id="ibrows_translation_helper.ymlcreator" class="Ibrows\TranslationHelperBundle\Translation\YmlCreator">
             <argument type="service" id="translation.writer"></argument>
