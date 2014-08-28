@@ -36,7 +36,7 @@ class CompilerPass implements CompilerPassInterface
 
 
         $creator = $containerBuilder->getDefinition($creatorKey);
-        $configs = $containerBuilder->getParameter('ibrows_translation_helper.defaultCreator');
+        $configs = $containerBuilder->getParameter('ibrows_translation_helper.creator');
         $rfClass = new \ReflectionClass($creator->getClass());
         foreach ($configs as $key => $value) {
             if ($rfClass->hasMethod('set' . $key)) {

@@ -29,7 +29,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('ignoreDomains')->prototype('variable')->end()->end()
                 ->booleanNode('deleteCache')->defaultFalse()->end()
             ->end()->end()
-            ->arrayNode('defaultCreator')->addDefaultsIfNotSet()->children()
+            ->arrayNode('creator')->addDefaultsIfNotSet()->children()
                 ->scalarNode('format')->defaultValue('yml')->end()
                 ->scalarNode('path')->defaultValue(null)->end()
                 ->scalarNode('decorate')->defaultValue('___%s')->end()
