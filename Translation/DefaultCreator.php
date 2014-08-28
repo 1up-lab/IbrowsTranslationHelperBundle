@@ -122,12 +122,13 @@ class DefaultCreator implements CreatorInterface
      * @param MessageCatalogue $catalogue
      */
     protected function setNewId($id, $domain, MessageCatalogue $catalogue) {
-
         $value = $this->checkForDefaultValue($id, $catalogue->getLocale() );
+        if(!$value && $catalogue->getFallbackCatalogue()){
+            $value = $this->checkForDefaultValue($id, $catalogue->getFallbackCatalogue()->getLocale() );
+        }
         if(!$value){
             $value = $this->decorate($id);
         }
-
         $catalogue->set($id, $value, $domain);
     }
     protected  $fileDefaultValueData = array();
