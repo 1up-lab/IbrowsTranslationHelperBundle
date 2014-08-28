@@ -130,18 +130,28 @@ class DefaultCreator implements CreatorInterface
 
         $catalogue->set($id, $value, $domain);
     }
+    protected  $fileDefaultValueData = array();
+
+    protected function getFileDefaultValueData($filename,$force = false){
+        if(array_key_exists($filename,$this->fileDefaultValueData) && !$force){
+            return  $this->fileDefaultValueData[$filename];
+        }
+        $this->fileDefaultValueData[$filename] = null;
+        $value = Yaml::parse($filename);
+        if(!is_array($value)){
+            return null;
+        }
+        $normalized = $this->normalizeData($value);
+        $this->fileDefaultValueData[$filename] = $normalized;
+        return $normalized;
+    }
 
     protected function checkForDefaultValue($key ,$locale){
         $file = $this->createFilename($locale);
         if(!$file){
             return null;
         }
-
-        $value = Yaml::parse($file);
-        if(!is_array($value)){
-            return null;
-        }
-        $normalized = $this->normalizeData($value);
+        $normalized = $this->getFileDefaultValueData($file);
 
         if(isset($normalized[$key])){
             return $normalized[$key];
