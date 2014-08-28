@@ -299,7 +299,9 @@ class DefaultCreator implements CreatorInterface
      */
     protected function decorate($id)
     {
-        $id = ucfirst($id);
+        if($this->ucFirst){
+            $id = ucfirst($id);
+        }
 
         return sprintf($this->decorate, $id);
     }
