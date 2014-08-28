@@ -57,16 +57,23 @@ class DefaultCreator implements CreatorInterface
      * @param string $path
      * @internal param \Symfony\Component\Translation\TranslatorInterface $translator
      */
-    public function __construct(TranslationWriter $writer, $format, $path, $defaultYML, $ucFirst)
+    public function __construct(TranslationWriter $writer, $format, $path, $defaultYML)
     {
         $this->writer = $writer;
         $this->format = $format;
         $this->path = $path;
         $this->defaultYML = $defaultYML;
-        $this->ucFirst = $ucFirst;
         if (!$this->supportFormat($format)) {
             throw new \Exception('Wrong format' . $format . '. Supported formats are ' . implode(', ', $supportedFormats));
         }
+    }
+
+    /**
+     * @param boolean $ucFirst
+     */
+    public function setUcFirst($ucFirst)
+    {
+        $this->ucFirst = $ucFirst;
     }
 
 
