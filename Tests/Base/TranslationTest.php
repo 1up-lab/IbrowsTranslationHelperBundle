@@ -54,7 +54,7 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
 
     public function testCreator(){
         $messageCatalogue = new MessageCatalogue('de');
-        $defaultCreator = $this->setUpCreator();
+        $defaultCreator = $this->setUpCreator(false);
 
         $defaultCreator->setDecorate("!!!%s");
         $defaultCreator->createTranslation('test','messages','de',$messageCatalogue);
@@ -70,7 +70,6 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
         $messageCatalogue = new MessageCatalogue('de');
         $defaultCreator = $this->setUpCreator();
 
-        $defaultCreator->setDefaultYML(__DIR__);
         $defaultCreator->createTranslation('simple','messages','de',$messageCatalogue);
 
         $this->assertFileExists($this->getMessagesFilePath());
@@ -85,7 +84,6 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
         $messageCatalogue->addFallbackCatalogue(new MessageCatalogue('de'));
         $defaultCreator = $this->setUpCreator();
 
-        $defaultCreator->setDefaultYML(__DIR__);
         $defaultCreator->createTranslation('simple','messages','de',$messageCatalogue);
 
         $this->assertFileExists($this->getMessagesFilePath());
@@ -99,7 +97,6 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
         $messageCatalogue = new MessageCatalogue('de');
         $defaultCreator = $this->setUpCreator();
 
-        $defaultCreator->setDefaultYML(__DIR__);
         $defaultCreator->createTranslation('hello.simple','messages','de',$messageCatalogue);
 
         $this->assertFileExists($this->getMessagesFilePath());
@@ -113,7 +110,6 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
         $messageCatalogue = new MessageCatalogue('de');
         $defaultCreator = $this->setUpCreator();
 
-        $defaultCreator->setDefaultYML(__DIR__);
         $defaultCreator->createTranslation('dottest.test','messages','de',$messageCatalogue);
 
         $this->assertFileExists($this->getMessagesFilePath());
@@ -127,7 +123,6 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
         $messageCatalogue = new MessageCatalogue('de');
         $defaultCreator = $this->setUpCreator();
 
-        $defaultCreator->setDefaultYML(__DIR__);
         $defaultCreator->createTranslation('abc.first','messages','de',$messageCatalogue);
 
         $this->assertFileExists($this->getMessagesFilePath());
@@ -137,11 +132,29 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('first',$data['abc.first']);
     }
 
-    protected function setUpCreator(){
+    public function testDefaultYmlDirs(){
+        $messageCatalogue = new MessageCatalogue('de');
+        $defaultCreator = $this->setUpCreator();
+
+        $defaultCreator->setDefaultYmlDirs(array(__DIR__ . DIRECTORY_SEPARATOR . 'default.de.yml',__DIR__ . DIRECTORY_SEPARATOR . 'default'));
+        $defaultCreator->createTranslation('abc.first','messages','de',$messageCatalogue);
+
+        $this->assertFileExists($this->getMessagesFilePath());
+        $data = Yaml::parse($this->getMessagesFilePath());
+        $this->assertCount(1, $data);
+        $this->assertArrayHasKey('abc.first',$data);
+        $this->assertEquals('firstdefault',$data['abc.first']);
+    }
+
+
+    protected function setUpCreator($setDefaultYmlDirs=true){
         $translationWriter = new TranslationWriter();
         $dumper = new YamlFileDumper();
         $translationWriter->addDumper('yml',$dumper);
         $defaultCreator = new DefaultCreator($translationWriter,'yml',$this->getTranslationFolder());
+        if($setDefaultYmlDirs){
+            $defaultCreator->setDefaultYmlDirs(array(__DIR__ . DIRECTORY_SEPARATOR . 'default.de.yml'));
+        }
         return $defaultCreator;
     }
 

@@ -41,14 +41,10 @@ class DefaultCreator implements CreatorInterface
     protected $decorate = "__%s";
 
     /**
-     * @var string
+     * @var array
      */
-    protected $defaultYML = null;
+    protected $defaultYmlDirs = null;
 
-    /**
-     * @var string
-     */
-    protected $defaultYMLFilename = "default";
 
     /**
      * @var bool
@@ -85,12 +81,14 @@ class DefaultCreator implements CreatorInterface
     }
 
     /**
-     * @param string $defaultYML
+     * @param array $defaultYmlDirs
      */
-    public function setDefaultYML($defaultYML)
+    public function setDefaultYmlDirs(array $defaultYmlDirs)
     {
-        $this->defaultYML = $defaultYML;
+        $this->defaultYmlDirs = $defaultYmlDirs;
     }
+
+
 
     /**
      * @param string $id
@@ -204,19 +202,24 @@ class DefaultCreator implements CreatorInterface
      */
     protected function checkForDefaultValue($key, $locale)
     {
-        $file = $this->createFilename($locale);
-        if (!$file) {
+        $files = $this->createFilenames($locale);
+        if (!$files) {
             return null;
         }
-        $normalized = $this->getFileDefaultValueData($file);
-        if (isset($normalized[$key])) {
-            return $normalized[$key];
+        foreach($files as $file){
+            $normalized = $this->getFileDefaultValueData($file);
+            if (isset($normalized[$key])) {
+                return $normalized[$key];
+            }
+        }
+        foreach($files as $file){
+            $normalized = $this->getFileDefaultValueData($file);
+            $key = $this->seperateKeyFromPath($key);
+            if (isset($normalized[$key])) {
+                return $normalized[$key];
+            }
         }
 
-        $key = $this->seperateKeyFromPath($key);
-        if (isset($normalized[$key])) {
-            return $normalized[$key];
-        }
 
         return null;
     }
@@ -248,19 +251,49 @@ class DefaultCreator implements CreatorInterface
         return $result;
     }
 
-    /**
-     * @param $locale
-     * @return null|string
-     */
-    protected function createFilename($locale)
-    {
-        if (!$this->defaultYML) {
-            return null;
+    protected static function getFiles($dir) {
+        $files = array();
+        $internalFiles = array_diff(scandir($dir), array('.','..'));
+        foreach ($internalFiles as $file) {
+            $filePath = $dir.DIRECTORY_SEPARATOR. $file;
+            if(is_dir($filePath)){
+                $files += static::getFiles($filePath);
+            }else{
+                $files[] = $filePath;
+            }
         }
-
-        return $this->defaultYML . "/" . $this->defaultYMLFilename . "." . $locale . ".yml";
+        return $files;
     }
 
+    /**
+     * @param $locale
+     * @return null|array
+     */
+    protected function createFilenames($locale)
+    {
+        if (!$this->defaultYmlDirs) {
+            return null;
+        }
+        $files = array();
+        foreach($this->defaultYmlDirs as $dir){
+            if(is_dir($dir)){
+                $files = array_merge($files,static::getFiles($dir));
+            }else{
+                $files[] = $dir;
+            }
+        }
+        foreach($files as $key => $file){
+            if(strpos($file,"$locale.yml") !== strlen($file)-strlen("$locale.yml")){
+
+                unset($files[$key]);
+            }
+        }
+        return $files;
+    }
+
+    protected function checkLocale($file){
+
+    }
     /**
      * @param $id string with dots
      * @return string
