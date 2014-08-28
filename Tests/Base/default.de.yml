@@ -1,0 +1,8 @@
+first: first
+test:
+  first:
+      value
+  second:
+      value2
+dottest.test: hello
+simple: simple

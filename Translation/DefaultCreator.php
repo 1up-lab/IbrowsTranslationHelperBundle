@@ -97,7 +97,7 @@ class DefaultCreator implements CreatorInterface
      * @param string $domain
      * @param string $locale
      * @param MessageCatalogue $catalogue
-     * @return string|void
+     * @return void
      */
     public function createTranslation($id, $domain, $locale, MessageCatalogue $catalogue)
     {
@@ -209,37 +209,16 @@ class DefaultCreator implements CreatorInterface
             return null;
         }
         $normalized = $this->getFileDefaultValueData($file);
-
         if (isset($normalized[$key])) {
             return $normalized[$key];
         }
 
         $key = $this->seperateKeyFromPath($key);
-        $normalized = $this->normalizeDataWithKey($value);
         if (isset($normalized[$key])) {
             return $normalized[$key];
         }
 
         return null;
-    }
-
-    /**
-     * creates a simple key => value
-     * @param array $data
-     * @param array $result
-     * @return array
-     */
-    protected function normalizeDataWithKey(array $data, &$result = array())
-    {
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $this->normalizeDataWithKey($value, $result);
-            } else {
-                $result[$key] = $value;
-            }
-        }
-
-        return $result;
     }
 
     /**
