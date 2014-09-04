@@ -23,6 +23,7 @@ class Configuration implements ConfigurationInterface
         $rootNode->children()
             ->arrayNode('translator')->addDefaultsIfNotSet()->children()
                 ->booleanNode('normalize')->defaultTrue()->end()
+                ->booleanNode('remember')->defaultFalse()->end()
                 ->booleanNode('create')->defaultTrue()->end()
                 ->scalarNode('creator')->defaultValue('ibrows_translation_helper.defaultcreator')->end()
                 ->scalarNode('decorate')->defaultValue('!!!%s')->end()

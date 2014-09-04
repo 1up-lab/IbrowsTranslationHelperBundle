@@ -31,6 +31,11 @@ class TranslatorWrapper implements TranslatorInterface
     /**
      * @var bool
      */
+    protected $remember = false;
+    protected $rememberCache = array();
+    /**
+     * @var bool
+     */
     protected $create = true;
     /**
      * @var bool
@@ -82,12 +87,14 @@ class TranslatorWrapper implements TranslatorInterface
 
         $catalogue = $this->getCatalogue($locale);
         if ($catalogue->has($id, $domain)) {
+            $this->addToCache($id, $parameters, $domain, $locale, $result);
             return $result;
         }
 
         if ($this->normalize) {
             $id = $this->normalize($id);
             if ($catalogue->has($id, $domain)) {
+                $this->addToCache($id, $parameters, $domain, $locale, $result);
                 return $this->translator->trans($id, $parameters, $domain, $locale);
             }
         }
@@ -99,10 +106,25 @@ class TranslatorWrapper implements TranslatorInterface
             }
         }
 
+        $result = sprintf($this->decorate, $result);
+        $this->addToCache($id, $parameters, $domain, $locale, $result);
 
-        return sprintf($this->decorate, $result);
-
+        return $result;
     }
+
+    private function addToCache($id, $parameters, $domain, $locale, $ret)
+    {
+        if($this->remember){
+            $this->rememberCache[$id] = array(
+                'parameters' => $parameters,
+                'domain' => $domain,
+                'locale' => $locale,
+                'result' => $ret,
+                'number' => null,
+            );
+        }
+    }
+
 
     /**
      * @param string $id
@@ -114,7 +136,17 @@ class TranslatorWrapper implements TranslatorInterface
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
-        return $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        $ret = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
+        if($this->remember){
+            $this->rememberCache[$id] = array(
+                'parameters' => $parameters,
+                'domain' => $domain,
+                'locale' => $locale,
+                'result' => $ret,
+                'number' => $number,
+            );
+        }
+        return $ret;
     }
 
     /**
@@ -155,6 +187,22 @@ class TranslatorWrapper implements TranslatorInterface
     public function setCreate($create)
     {
         $this->create = $create;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isRemember()
+    {
+        return $this->remember;
+    }
+
+    /**
+     * @param boolean $remember
+     */
+    public function setRemember($remember)
+    {
+        $this->remember = $remember;
     }
 
     /**
@@ -319,6 +367,14 @@ class TranslatorWrapper implements TranslatorInterface
     protected function normalize($string)
     {
         return mb_strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $string), 'UTF-8');
+    }
+
+    public function getTranslations($id = null){
+        if($id !== null){
+            return $this->rememberCache[$id];
+        }else{
+            return $this->rememberCache;
+        }
     }
 
 }

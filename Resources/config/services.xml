@@ -5,7 +5,6 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <services>
-
         <service id="ibrows_translation_helper.wrapper" class="Ibrows\TranslationHelperBundle\Translation\TranslatorWrapper">
             <argument type="service" id="ibrows_translation_helper.defaultcreator"></argument>
         </service>
@@ -19,6 +18,9 @@
             <argument type="string" >yml</argument>
             <argument type="string" >%kernel.root_dir%/Resources/translations</argument>
         </service>
-
+        <service id="ibrows_translation_helper.twig.transhelper" class="Ibrows\TranslationHelperBundle\Twig\TransExtension">
+            <argument type="service" id="ibrows_translation_helper.wrapper"/>
+            <tag name="twig.extension"/>
+        </service>
 	</services>
 </container>
