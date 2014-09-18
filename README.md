@@ -63,11 +63,12 @@ Install & setup the bundle
             decorate:             !!!%s
             ignoreDomains:        []
             deleteCache:          false
-        defaultCreator:
+        creator:
             format:               yml
             path:                 %kernel.root_dir%/../src/Ibrows/SampleBundle/Resources/translations
             decorate:             ___%s
             backup:               false
+            ucFirst:              false
     ```
 
 Avoid unnecessary translations in choices
