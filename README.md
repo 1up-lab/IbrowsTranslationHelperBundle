@@ -92,3 +92,8 @@ And use this for SonataAdmin
                 - 'IbrowsTranslationHelperBundle::form_admin_fields.html.twig'
 ```
 
+``` yml
+    sonata_admin:
+        templates:
+            filter: IbrowsTranslationHelperBundle::form_admin_fields.html.twig
+```
