@@ -30,7 +30,7 @@
             {% else %}
                 <option value="{{ choice.value }}"{% if choice is selectedchoice(value) %} selected="selected"{% endif %}>
                     {% if (attr.translateChoiceValue is defined and attr.translateChoiceValue == false) or
-                          (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == false)  %}
+                    (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == false)  %}
                         {{ choice.label }}
                     {% else %}
                         {{ choice.label|trans({}, translation_domain) }}
@@ -48,7 +48,7 @@
             {% for child in form %}
                 {{ form_widget(child) }}
                 {% if (attr.translateChoiceValue is defined and attr.translateChoiceValue == false) or
-                      (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == false)  %}
+                (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == false)  %}
                     {% set transChoiceValue = false %}
                 {% else %}
                     {% set transChoiceValue = true %}
@@ -72,7 +72,7 @@
                 {% set label = name|humanize %}
             {% endif %}
             <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-            {% if label_attr.translateChoiceValue is defined and label_attr.translateChoiceValue == false %}
+            {% if (label_attr.translateChoiceValue is defined and label_attr.translateChoiceValue == false) or (form.parent is defined and form.parent.vars.label_attr.translateChoiceValue is defined and form.parent.vars.label_attr.translateChoiceValue == false) %}
                 {{ label }}
             {% else %}
                 {{ label|trans({}, translation_domain) }}
