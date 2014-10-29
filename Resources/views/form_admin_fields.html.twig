@@ -49,11 +49,15 @@
 
             {% if in_list_checkbox is defined and in_list_checkbox and widget is defined %}
                 <label{% for attrname,attrvalue in attr %} {{attrname}}="{{attrvalue}}"{% endfor %}>
-                {{ widget|raw }}
-                <span>
-                 {#dont translate here#}
-                 {{ label}}
-                </span>
+                    {{ widget|raw }}
+                    <span>
+                        {% if (attr.translateChoiceValue is defined and attr.translateChoiceValue == true) or
+                        (form.parent.vars.attr.translateChoiceValue is defined and form.parent.vars.attr.translateChoiceValue == true)  %}
+                            {{ label|trans }}
+                        {% else %}
+                            {{ label }}
+                        {% endif %}
+                    </span>
                 </label>
             {% else %}
                 <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
