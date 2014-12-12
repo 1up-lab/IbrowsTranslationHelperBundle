@@ -71,14 +71,12 @@
             {% if label is empty %}
                 {% set label = name|humanize %}
             {% endif %}
-            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {% if (label_attr.translateChoiceValue is defined and label_attr.translateChoiceValue == false) or (form.parent is defined and form.parent.vars.label_attr.translateChoiceValue is defined and form.parent.vars.label_attr.translateChoiceValue == false) %}
-                {{ label }}
+                {% set label_str = label %}
             {% else %}
-                {{ label|trans({}, translation_domain) }}
+                {% set label_str = label|trans({}, translation_domain) %}
             {% endif %}
-
-            </label>
+            <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>{{ label_str }}</label>
         {% endif %}
     {% endspaceless %}
 {% endblock form_label %}
