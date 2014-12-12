@@ -71,7 +71,7 @@
             {% if label is empty %}
                 {% set label = name|humanize %}
             {% endif %}
-            {% if label_attr.translateChoiceValue is defined and label_attr.translateChoiceValue == false %}
+            {% if (label_attr.translateChoiceValue is defined and label_attr.translateChoiceValue == false) or (form.parent is defined and form.parent.vars.label_attr.translateChoiceValue is defined and form.parent.vars.label_attr.translateChoiceValue == false) %}
                 {% set label_str = label %}
             {% else %}
                 {% set label_str = label|trans({}, translation_domain) %}
