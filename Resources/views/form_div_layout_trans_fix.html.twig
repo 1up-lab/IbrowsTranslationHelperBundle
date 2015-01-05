@@ -5,6 +5,13 @@
     {{ block('choice_widget') }}
 {% endblock %}
 
+{% block language_widget %}
+    {% if attr.translateChoiceValue is not defined %}
+        {% set attr = attr|merge({'translateChoiceValue': false}) %}
+    {% endif %}
+    {{ block('choice_widget') }}
+{% endblock %}
+
 {% block locale_widget %}
     {% if attr.translateChoiceValue is not defined %}
         {% set attr = attr|merge({'translateChoiceValue': false}) %}
