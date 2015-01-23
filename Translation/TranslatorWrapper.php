@@ -28,6 +28,7 @@ class TranslatorWrapper implements TranslatorInterface
      * @var bool
      */
     protected $normalize = true;
+
     /**
      * @var bool
      */
@@ -51,7 +52,7 @@ class TranslatorWrapper implements TranslatorInterface
     protected $ignoreDomains = array();
 
     /**
-     * @param CreatorInterface $creator
+     * @param CreatorInterface    $creator
      * @param TranslatorInterface $translator
      */
     public function __construct(CreatorInterface $creator, TranslatorInterface $translator)
@@ -62,9 +63,9 @@ class TranslatorWrapper implements TranslatorInterface
 
     /**
      * @param string $id
-     * @param array $parameters
-     * @param null $domain
-     * @param null $locale
+     * @param array  $parameters
+     * @param null   $domain
+     * @param null   $locale
      * @return string
      */
     public function trans($id, array $parameters = array(), $domain = null, $locale = null)
@@ -112,38 +113,24 @@ class TranslatorWrapper implements TranslatorInterface
         return $result;
     }
 
-    private function addToCache($id, $parameters, $domain, $locale, $ret)
-    {
-        if($this->remember){
-            $this->rememberCache[$id] = array(
-                'parameters' => $parameters,
-                'domain' => $domain,
-                'locale' => $locale,
-                'result' => $ret,
-                'number' => null,
-            );
-        }
-    }
-
-
     /**
      * @param string $id
-     * @param int $number
-     * @param array $parameters
-     * @param null $domain
-     * @param null $locale
+     * @param int    $number
+     * @param array  $parameters
+     * @param null   $domain
+     * @param null   $locale
      * @return string
      */
     public function transChoice($id, $number, array $parameters = array(), $domain = null, $locale = null)
     {
         $ret = $this->translator->transChoice($id, $number, $parameters, $domain, $locale);
-        if($this->remember){
+        if ($this->remember) {
             $this->rememberCache[$id] = array(
                 'parameters' => $parameters,
-                'domain' => $domain,
-                'locale' => $locale,
-                'result' => $ret,
-                'number' => $number,
+                'domain'     => $domain,
+                'locale'     => $locale,
+                'result'     => $ret,
+                'number'     => $number,
             );
         }
         return $ret;
@@ -278,6 +265,15 @@ class TranslatorWrapper implements TranslatorInterface
         }
     }
 
+    public function getTranslations($id = null)
+    {
+        if ($id !== null) {
+            return $this->rememberCache[$id];
+        } else {
+            return $this->rememberCache;
+        }
+    }
+
     /**
      * Remove the cache file corresponding to the given locale.
      *
@@ -286,7 +282,7 @@ class TranslatorWrapper implements TranslatorInterface
      */
     protected function removeCacheFile($locale)
     {
-        if(!$this->getCacheDir()){
+        if (!$this->getCacheDir()) {
             return false;
         }
         $localeExploded = explode('_', $locale);
@@ -312,9 +308,9 @@ class TranslatorWrapper implements TranslatorInterface
      *
      * @param array $locales
      */
-    protected  function removeLocalesCacheFiles(array $locales)
+    protected function removeLocalesCacheFiles(array $locales)
     {
-        if(!$this->getCacheDir()){
+        if (!$this->getCacheDir()) {
             return false;
         }
         foreach ($locales as $locale) {
@@ -351,7 +347,8 @@ class TranslatorWrapper implements TranslatorInterface
     /**
      * @return string
      */
-    protected function getCacheDir(){
+    protected function getCacheDir()
+    {
         $rf = new \ReflectionObject($this->translator);
         $rfp = $rf->getProperty('options');
         $rfp->setAccessible(true);
@@ -366,14 +363,22 @@ class TranslatorWrapper implements TranslatorInterface
      */
     protected function normalize($string)
     {
-        return mb_strtolower(preg_replace('/(?<=[a-z])([A-Z])/', '_$1', $string), 'UTF-8');
+        $string = preg_replace('/(?<=[a-z])([[:upper:]])/', '_$1', $string);
+        $string = mb_strtolower($string, 'UTF-8');
+        $string = preg_replace('/[\s_]+/', '_', $string);
+        return $string;
     }
 
-    public function getTranslations($id = null){
-        if($id !== null){
-            return $this->rememberCache[$id];
-        }else{
-            return $this->rememberCache;
+    private function addToCache($id, $parameters, $domain, $locale, $ret)
+    {
+        if ($this->remember) {
+            $this->rememberCache[$id] = array(
+                'parameters' => $parameters,
+                'domain'     => $domain,
+                'locale'     => $locale,
+                'result'     => $ret,
+                'number'     => null,
+            );
         }
     }
 

@@ -30,6 +30,43 @@ class TranslationTest extends \PHPUnit_Framework_TestCase
 
     }
 
+
+    public function providerNormalize(){
+        return array(
+            array('blah_foo', 'blah foo'),
+            array('blah_foo', 'blah  foo'),
+            array('blah_foo', 'blah _foo'),
+            array('blah_foo', 'Blah foo'),
+            array('blah_foo', 'blah  foo'),
+            array('blah_foo', 'blah_foo'),
+            array('blah_foo', 'blah__foo'),
+            array('blah_foo', 'blah___foo'),
+            array('blah_foo', 'blah _Foo'),
+            array('blah_foo', 'blahFoo'),
+            array('blah_foo', 'blah_Foo'),
+            array('blah_foo', 'Blah_Foo'),
+            array('blah_füü', 'Blah_FüÜ'),
+            array('blah_ü', 'BlahÜ'),
+        );
+    }
+
+
+    /**
+     * @dataProvider providerNormalize
+     * @param $expected
+     * @param $input
+     */
+    public function testTranslatorNormalize($expected, $input)
+    {
+        $translator = $this->getTranslationWrapper();
+        /* @var $translator TranslatorWrapper */
+        $translator->setCreate(false);
+        $translator->setNormalize(true);
+        $method = new \ReflectionMethod(get_class($translator), 'normalize');
+        $method->setAccessible(TRUE);
+        $this->assertEquals($expected,$method->invoke($translator, $input));
+    }
+
     public function testTranslator()
     {
         $translator = $this->getTranslationWrapper();
