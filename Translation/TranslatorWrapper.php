@@ -363,9 +363,9 @@ class TranslatorWrapper implements TranslatorInterface
      */
     protected function normalize($string)
     {
-        $string = preg_replace('/(?<=[a-z])([[:upper:]])/', '_$1', $string);
+        $string = preg_replace('/(?<=[a-z])([\p{Lu}])/u', '_$1', $string);
         $string = mb_strtolower($string, 'UTF-8');
-        $string = preg_replace('/[\s_]+/', '_', $string);
+        $string = preg_replace('/[\s_]+/u'  , '_', $string);
         return $string;
     }
 
