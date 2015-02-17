@@ -41,6 +41,10 @@ class TranslatorWrapper implements TranslatorInterface
     /**
      * @var bool
      */
+    protected $createFallback = true;
+    /**
+     * @var bool
+     */
     protected $deleteCache = true;
     /**
      * @var string
@@ -106,7 +110,14 @@ class TranslatorWrapper implements TranslatorInterface
                 $this->removeLocalesCacheFiles(array($locale));
             }
         }
-
+        if ($this->createFallback) {
+            $fallbackCatalogue = $catalogue->getFallbackCatalogue();
+            $fallbackLocale = $fallbackCatalogue->getLocale();
+            $this->creator->createTranslation($id, $domain, $fallbackLocale, $fallbackCatalogue);
+            if ($this->deleteCache) {
+                $this->removeLocalesCacheFiles(array($fallbackLocale));
+            }
+        }
         $result = sprintf($this->decorate, $result);
         $this->addToCache($id, $parameters, $domain, $locale, $result);
 
@@ -174,6 +185,14 @@ class TranslatorWrapper implements TranslatorInterface
     public function setCreate($create)
     {
         $this->create = $create;
+    }
+
+    /**
+     * @param boolean $createFallback
+     */
+    public function setCreateFallback($createFallback)
+    {
+        $this->createFallback = $createFallback;
     }
 
     /**

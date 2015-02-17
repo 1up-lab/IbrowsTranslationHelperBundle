@@ -25,6 +25,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('normalize')->defaultTrue()->end()
                 ->booleanNode('remember')->defaultFalse()->end()
                 ->booleanNode('create')->defaultTrue()->end()
+                ->booleanNode('createFallback')->defaultFalse()->end()
                 ->scalarNode('creator')->defaultValue('ibrows_translation_helper.defaultcreator')->end()
                 ->scalarNode('decorate')->defaultValue('!!!%s')->end()
                 ->arrayNode('ignoreDomains')->prototype('variable')->end()->end()
