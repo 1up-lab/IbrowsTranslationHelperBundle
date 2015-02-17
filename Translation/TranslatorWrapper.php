@@ -112,10 +112,12 @@ class TranslatorWrapper implements TranslatorInterface
         }
         if ($this->createFallback) {
             $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-            $fallbackLocale = $fallbackCatalogue->getLocale();
-            $this->creator->createTranslation($id, $domain, $fallbackLocale, $fallbackCatalogue);
-            if ($this->deleteCache) {
-                $this->removeLocalesCacheFiles(array($fallbackLocale));
+            if($fallbackCatalogue) {
+                $fallbackLocale = $fallbackCatalogue->getLocale();
+                $this->creator->createTranslation($id, $domain, $fallbackLocale, $fallbackCatalogue);
+                if ($this->deleteCache) {
+                    $this->removeLocalesCacheFiles(array($fallbackLocale));
+                }
             }
         }
         $result = sprintf($this->decorate, $result);
