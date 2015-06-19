@@ -13,8 +13,8 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "symfony/symfony": ">=2.1",
-        "symfony/framework-bundle": ">=2.1"
+        "symfony/symfony": "~2.7",
+        "symfony/framework-bundle": "~2.7"
     },
     "autoload": {
         "psr-4": { "Ibrows\\TranslationHelperBundle\\": "" }
