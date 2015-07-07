@@ -4,6 +4,7 @@ namespace Ibrows\TranslationHelperBundle\Translation;
 
 
 use Symfony\Component\Translation\MessageCatalogue;
+use Symfony\Component\Translation\TranslatorBagInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 
@@ -11,11 +12,11 @@ use Symfony\Component\Translation\TranslatorInterface;
  * Class TranslatorWrapper
  * @package Ibrows\TranslationHelperBundle\Translation
  */
-class TranslatorWrapper implements TranslatorInterface
+class TranslatorWrapper implements TranslatorInterface, TranslatorBagInterface
 {
 
     /**
-     * @var \Symfony\Component\Translation\TranslatorInterface
+     * @var TranslatorInterface|TranslatorBagInterface
      */
     protected $translator;
 
@@ -332,7 +333,7 @@ class TranslatorWrapper implements TranslatorInterface
     protected function removeLocalesCacheFiles(array $locales)
     {
         if (!$this->getCacheDir()) {
-            return false;
+            return;
         }
         foreach ($locales as $locale) {
             $this->removeCacheFile($locale);
@@ -354,15 +355,9 @@ class TranslatorWrapper implements TranslatorInterface
      * @param $locale
      * @return MessageCatalogue
      */
-    protected function getCatalogue($locale)
+    public function getCatalogue($locale = null)
     {
-        $rf = new \ReflectionObject($this->translator);
-        $rfp = $rf->getProperty('catalogues');
-        $rfp->setAccessible(true);
-        $catalogues = $rfp->getValue($this->translator);
-        $rfp->setAccessible(false);
-
-        return $catalogues[$locale];
+        return $this->translator->getCatalogue($locale);
     }
 
     /**
@@ -403,4 +398,6 @@ class TranslatorWrapper implements TranslatorInterface
         }
     }
 
+
 }
+
