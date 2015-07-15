@@ -77,7 +77,6 @@ class TranslatorWrapper implements TranslatorInterface, TranslatorBagInterface
     {
 
         $id = (string)$id;
-        $result = $this->translator->trans($id, $parameters, $domain, $locale);
 
         if (null === $locale) {
             $locale = $this->translator->getLocale();
@@ -88,32 +87,34 @@ class TranslatorWrapper implements TranslatorInterface, TranslatorBagInterface
         }
 
         if (in_array($domain, $this->ignoreDomains)) {
+            $result = $this->translator->trans($id, $parameters, $domain, $locale);
             return $result;
         }
 
-        $catalogue = $this->getCatalogue($locale);
-        if ($catalogue->has($id, $domain)) {
+        if ($this->isInCatalogue($id, $domain, $locale)) {
+            $result = $this->translator->trans($id, $parameters, $domain, $locale);
             $this->addToCache($id, $parameters, $domain, $locale, $result);
             return $result;
         }
 
         if ($this->normalize) {
             $id = $this->normalize($id);
-            if ($catalogue->has($id, $domain)) {
+            if ($this->isInCatalogue($id, $domain, $locale)) {
+                $result = $this->translator->trans($id, $parameters, $domain, $locale);
                 $this->addToCache($id, $parameters, $domain, $locale, $result);
                 return $this->translator->trans($id, $parameters, $domain, $locale);
             }
         }
 
         if ($this->create) {
-            $this->creator->createTranslation($id, $domain, $locale, $catalogue);
+            $this->creator->createTranslation($id, $domain, $locale, $this->getCatalogue($locale));
             if ($this->deleteCache) {
                 $this->removeLocalesCacheFiles(array($locale));
             }
         }
         if ($this->createFallback) {
-            $fallbackCatalogue = $catalogue->getFallbackCatalogue();
-            if($fallbackCatalogue) {
+            $fallbackCatalogue = $this->getCatalogue($locale)->getFallbackCatalogue();
+            if ($fallbackCatalogue) {
                 $fallbackLocale = $fallbackCatalogue->getLocale();
                 $this->creator->createTranslation($id, $domain, $fallbackLocale, $fallbackCatalogue);
                 if ($this->deleteCache) {
@@ -121,6 +122,7 @@ class TranslatorWrapper implements TranslatorInterface, TranslatorBagInterface
                 }
             }
         }
+        $result = $this->translator->trans($id, $parameters, $domain, $locale);
         $result = sprintf($this->decorate, $result);
         $this->addToCache($id, $parameters, $domain, $locale, $result);
 
@@ -173,12 +175,9 @@ class TranslatorWrapper implements TranslatorInterface, TranslatorBagInterface
      * @param $locale
      * @return mixed
      */
-    public function isInCatalogue($id, $domain, $locale)
+    private function isInCatalogue($id, $domain, $locale)
     {
-
-        $catalogue = $this->getCatalogues($locale);
-
-        return ($catalogue->has((string)$id, $domain));
+        return ($this->getCatalogue($locale)->has((string)$id, $domain));
 
     }
 
@@ -381,7 +380,7 @@ class TranslatorWrapper implements TranslatorInterface, TranslatorBagInterface
     {
         $string = preg_replace('/(?<=[a-z])([\p{Lu}])/u', '_$1', $string);
         $string = mb_strtolower($string, 'UTF-8');
-        $string = preg_replace('/[\s_]+/u'  , '_', $string);
+        $string = preg_replace('/[\s_]+/u', '_', $string);
         return $string;
     }
 
