@@ -14,6 +14,16 @@ class TranslationWebTest extends WebTestCase
     public function testTranslatorWrapped()
     {
         $translator = $this->container->get('translator');
+        if(get_class($translator) == 'Symfony\Component\Translation\DataCollectorTranslator' ){
+            $rp = new \ReflectionProperty(get_class($translator), 'translator');
+            $rp->setAccessible(true);
+            $translator = $rp->getValue($translator);
+        }
+        if(get_class($translator) == 'Symfony\Component\Translation\LoggingTranslator' ){
+            $rp = new \ReflectionProperty(get_class($translator), 'translator');
+            $rp->setAccessible(true);
+            $translator = $rp->getValue($translator);
+        }
 
         $this->assertInstanceOf('Ibrows\TranslationHelperBundle\Translation\TranslatorWrapper', $translator);
 
@@ -52,10 +62,11 @@ class TranslationWebTest extends WebTestCase
         /* @var $creator DefaultCreator */
         $creator->setPath($this->getTranslationPath());
 
+
         $translator->setDecorate('!!!%s');
 
         $trans = $translator->trans('TestTrans!', array(), 'Test', 'fr');
-        $this->assertEquals("!!!TestTrans!", $trans);
+        $this->assertEquals("!!!test_trans!", $trans);
 
         $trans = $translator->trans('TestTrans!', array(), 'Test', 'fr');
         $this->assertEquals("___test_trans!", $trans);
@@ -67,7 +78,7 @@ class TranslationWebTest extends WebTestCase
         $this->assertEquals("___test_trans!", $trans);
 
         $trans = $translator->trans('TestTrans!', array(), 'Test', 'en_US');
-        $this->assertEquals("!!!TestTrans!", $trans);
+        $this->assertEquals("!!!test_trans!", $trans);
 
         $translator->setNormalize(false);
 

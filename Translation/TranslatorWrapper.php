@@ -102,9 +102,10 @@ class TranslatorWrapper implements TranslatorInterface, TranslatorBagInterface
             if ($this->isInCatalogue($id, $domain, $locale)) {
                 $result = $this->translator->trans($id, $parameters, $domain, $locale);
                 $this->addToCache($id, $parameters, $domain, $locale, $result);
-                return $this->translator->trans($id, $parameters, $domain, $locale);
+                return $result;
             }
         }
+        $result = $this->translator->trans($id, $parameters, $domain, $locale);
 
         if ($this->create) {
             $this->creator->createTranslation($id, $domain, $locale, $this->getCatalogue($locale));
@@ -122,7 +123,7 @@ class TranslatorWrapper implements TranslatorInterface, TranslatorBagInterface
                 }
             }
         }
-        $result = $this->translator->trans($id, $parameters, $domain, $locale);
+
         $result = sprintf($this->decorate, $result);
         $this->addToCache($id, $parameters, $domain, $locale, $result);
 
