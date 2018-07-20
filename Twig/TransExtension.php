@@ -26,7 +26,7 @@ class TransExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            'getTranslations' => new \Twig_SimpleFunction('getTranslations', $this),
+            new \Twig_SimpleFunction('getTranslations', array($this,'getTranslations')),
         );
     }
 
